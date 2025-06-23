@@ -13,7 +13,7 @@ services:
       - key: DISABLE_COLLECTSTATIC
         value: "0"  # Changed to enable collectstatic
       - key: PYTHON_VERSION
-        value: "3.9.7"  # Add your Python version
+        value: "3.13.5"  # Add your Python version
 
 databases:
   - name: minisocialmedia-db  # Changed to unique name
