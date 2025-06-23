@@ -3,7 +3,7 @@ services:
     name: minisocialmedia
     runtime: python
     buildCommand: "./build.sh"
-    startCommand: "gunicorn your_project.wsgi:application"
+    startCommand: "gunicorn socialmedia.wsgi:application"  # Changed to match your project
     branch: master
     envVars:
       - key: SECRET_KEY
@@ -11,8 +11,12 @@ services:
       - key: DEBUG
         value: "False"
       - key: DISABLE_COLLECTSTATIC
-        value: "1"  # Disable static file collection (we handle media manually)
+        value: "0"  # Changed to enable collectstatic
+      - key: PYTHON_VERSION
+        value: "3.9.7"  # Add your Python version
 
 databases:
-  - name: socialmedia-db
-    plan: free  # Free PostgreSQL
+  - name: minisocialmedia-db  # Changed to unique name
+    plan: free
+    databaseName: socialmedia  # Internal DB name
+    user: socialmedia_user
