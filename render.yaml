@@ -3,7 +3,7 @@ services:
     name: minisocialmedia
     runtime: python
     buildCommand: "./build.sh"
-    startCommand: "gunicorn socialmedia.wsgi:application"  # Changed to match your project
+    startCommand: "gunicorn socialmedia.wsgi:application"
     branch: master
     envVars:
       - key: SECRET_KEY
@@ -11,12 +11,20 @@ services:
       - key: DEBUG
         value: "False"
       - key: DISABLE_COLLECTSTATIC
-        value: "0"  # Changed to enable collectstatic
+        value: "0"
       - key: PYTHON_VERSION
-        value: "3.13.5"  # Add your Python version
+        value: "3.13.5"
+      # Explicit database connection (critical addition)
+      - key: DATABASE_URL
+        fromDatabase:
+          name: minisocialmedia-db
+          property: connectionString
+      # Required for Django to find your production settings
+      - key: DJANGO_SETTINGS_MODULE
+        value: "socialmedia.settings"
 
 databases:
-  - name: minisocialmedia-db  # Changed to unique name
+  - name: minisocialmedia-db
     plan: free
-    databaseName: socialmedia  # Internal DB name
+    databaseName: socialmedia
     user: socialmedia_user
