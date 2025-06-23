@@ -4,6 +4,7 @@ services:
     runtime: python
     buildCommand: "./build.sh"
     startCommand: "gunicorn your_project.wsgi:application"
+    branch: master
     envVars:
       - key: SECRET_KEY
         generateValue: true
