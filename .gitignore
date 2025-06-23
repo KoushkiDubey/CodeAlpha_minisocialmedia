@@ -1,0 +1,16 @@
+﻿@"
+# Python
+*.pyc
+__pycache__/
+*.log
+
+# Environments
+.env
+.env/
+venv/
+env/
+
+# Production
+*.pid
+*.seed
+"@ | Out-File -Encoding utf8 .gitignore

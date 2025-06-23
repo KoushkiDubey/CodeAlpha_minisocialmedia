@@ -1,0 +1,52 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Create Post</h5>
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.content }}
+                    <div class="mt-2">
+                        {{ form.image }}
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-2">Post</button>
+                </form>
+            </div>
+        </div>
+
+        {% for post in posts %}
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <img src="{{ post.author.profile.image.url }}" class="rounded-circle" width="30" height="30">
+                    <a href="{% url 'profile' post.author.username %}" class="text-decoration-none ms-2">
+                        {{ post.author.username }}
+                    </a>
+                </div>
+                <small class="text-muted">{{ post.date_posted|timesince }} ago</small>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ post.content }}</p>
+                {% if post.image %}
+                <img src="{{ post.image.url }}" class="img-fluid mb-3">
+                {% endif %}
+
+                <div class="d-flex justify-content-between">
+                    <button class="btn btn-sm btn-outline-primary like-btn" data-post-id="{{ post.id }}">
+                        <i class="far fa-thumbs-up"></i>
+                        <span class="like-count">{{ post.like_count }}</span>
+                    </button>
+                    <a href="{% url 'post_detail' post.id %}" class="btn btn-sm btn-outline-secondary">
+                        <i class="far fa-comment"></i> {{ post.comment_count }} Comments
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="alert alert-info">No posts to show. Follow some users to see their posts here!</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

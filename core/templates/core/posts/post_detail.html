@@ -1,0 +1,66 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                    <img src="{{ post.author.profile.image.url }}" class="rounded-circle" width="30" height="30">
+                    <a href="{% url 'profile' post.author.username %}" class="text-decoration-none ms-2">
+                        {{ post.author.username }}
+                    </a>
+                </div>
+                <small class="text-muted">{{ post.date_posted|timesince }} ago</small>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ post.content }}</p>
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" class="img-fluid mb-3">
+                {% endif %}
+
+                <!-- LIKE BUTTON SECTION (UPDATED) -->
+                <div class="d-flex justify-content-between mb-3">
+                    <button type="button"
+                            class="btn btn-sm like-btn {% if request.user in post.likes.all %}btn-primary{% else %}btn-outline-primary{% endif %}"
+                            data-post-id="{{ post.id }}"
+                            id="like-btn-{{ post.id }}">
+                        <i class="{% if request.user in post.likes.all %}fas{% else %}far{% endif %} fa-thumbs-up"></i>
+                        <span class="like-count ms-1">{{ post.likes.count }}</span>
+                    </button>
+                    <span class="text-muted">{{ post.comment_count }} comments</span>
+                    <!-- ADDED CSRF TOKEN HERE -->
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                </div>
+                <hr>
+
+                <h5>Comments</h5>
+                <form method="POST" class="mb-4">
+                    {% csrf_token %}
+                    {{ form.content }}
+                    <button type="submit" class="btn btn-primary mt-2">Post Comment</button>
+                </form>
+
+                {% for comment in comments %}
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <img src="{{ comment.author.profile.image.url }}" class="rounded-circle" width="30" height="30">
+                                <a href="{% url 'profile' comment.author.username %}" class="text-decoration-none ms-2">
+                                    {{ comment.author.username }}
+                                </a>
+                            </div>
+                            <small class="text-muted">{{ comment.date_posted|timesince }} ago</small>
+                        </div>
+                        <p class="mt-2">{{ comment.content }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="alert alert-info">No comments yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

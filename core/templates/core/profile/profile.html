@@ -1,0 +1,69 @@
+{% extends "core/base.html" %}
+{% load static %}  <!-- Add this at the top -->
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <!-- Fixed profile image with fallback -->
+                {% if user.profile.image %}
+                    <img src="{{ user.profile.image.url }}" class="rounded-circle mb-3" width="150" height="150" alt="{{ user.username }}'s profile picture">
+                {% else %}
+                    <img src="{% static 'core/images/default.jpg' %}" class="rounded-circle mb-3" width="150" height="150" alt="Default profile picture">
+                {% endif %}
+
+                <h3>{{ user.username }}</h3>
+                <p class="text-muted">{{ user.profile.bio }}</p>
+
+                <div class="d-flex justify-content-center mb-3">
+                    <div class="mx-3">
+                        <strong>{{ user.post_set.count }}</strong> Posts
+                    </div>
+                    <div class="mx-3">
+                        <strong>{{ user.profile.followers.count }}</strong> Followers
+                    </div>
+                    <div class="mx-3">
+                        <strong>{{ user.following.count }}</strong> Following
+                    </div>
+                </div>
+
+                {% if user != request.user %}
+                <form method="POST" action="{% url 'profile' user.username %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-{% if is_following %}secondary{% else %}primary{% endif %}">
+                        {% if is_following %}Following{% else %}Follow{% endif %}
+                    </button>
+                </form>
+                {% else %}
+                <a href="{% url 'update_profile' %}" class="btn btn-outline-secondary">Edit Profile</a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row">
+            {% for post in posts %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <a href="{% url 'post_detail' post.id %}">
+                        {% if post.image %}
+                        <img src="{{ post.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Post image">
+                        {% else %}
+                        <div class="card-img-top bg-light" style="height: 200px;"></div>
+                        {% endif %}
+                    </a>
+                    <div class="card-body">
+                        <p class="card-text">{{ post.content|truncatechars:50 }}</p>
+                        <small class="text-muted">{{ post.likes.count }} likes</small>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info">No posts yet.</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

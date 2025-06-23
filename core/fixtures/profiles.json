@@ -1,0 +1,22 @@
+[
+  {
+    "model": "core.profile",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "bio": "Just a test user exploring the platform",
+      "image": "profile_pics/default1.jpg",
+      "followers": [2]
+    }
+  },
+  {
+    "model": "core.profile",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "bio": "Another test user with cool posts",
+      "image": "profile_pics/default2.jpg",
+      "followers": []
+    }
+  }
+]

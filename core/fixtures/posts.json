@@ -1,0 +1,24 @@
+[
+  {
+    "model": "core.post",
+    "pk": 1,
+    "fields": {
+      "author": 1,
+      "content": "This is my first post!",
+      "image": "post_images/post01.jpg",
+      "date_posted": "2023-01-10T12:00:00Z",
+      "likes": [2]
+    }
+  },
+  {
+    "model": "core.post",
+    "pk": 2,
+    "fields": {
+      "author": 2,
+      "content": "Check out this cool photo!",
+      "image": "post_images/post02.jpg",
+      "date_posted": "2023-01-11T14:30:00Z",
+      "likes": [1]
+    }
+  }
+]
