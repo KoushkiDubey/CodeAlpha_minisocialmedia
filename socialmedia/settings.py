@@ -20,6 +20,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Added here for both dev and prod
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -75,8 +76,13 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'core/static')]
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Required for collectstatic
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'core/static'),  # Points to core/static/
+]
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'# Your app's static files
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -85,9 +91,10 @@ LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# Prevent session fixation
+
+# Session settings (secure settings will be overridden in production)
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = True  # If using HTTPS
+SESSION_COOKIE_SECURE = False  # Will be True in production
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
@@ -100,10 +107,10 @@ if not DEBUG:
     ALLOWED_HOSTS = ['your-app-name.onrender.com', 'localhost']  # Add your Render URL
     CSRF_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True  # Override the dev setting
 
     # Database (PostgreSQL on Render)
     import dj_database_url
-
     DATABASES = {
         'default': dj_database_url.config(
             default=os.getenv('DATABASE_URL'),
@@ -111,13 +118,8 @@ if not DEBUG:
         )
     }
 
-    # Static files (Whitenoise)
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+    # Static files with Whitenoise
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
     # Media files (Persistent storage on Render)
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Same as local
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-
-    # Optional: For better media handling, uncomment to use Render Volumes:
-    # MEDIA_ROOT = '/opt/render/media/'  # Requires volume setup in render.yaml
+    # MEDIA_ROOT = '/opt/render/media/'  # Uncomment if using Render Volumes
