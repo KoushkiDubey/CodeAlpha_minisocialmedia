@@ -104,7 +104,9 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 # ==============================================================================
 if not DEBUG:
     # Security
-    ALLOWED_HOSTS = ['your-app-name.onrender.com', 'localhost']  # Add your Render URL
+    ALLOWED_HOSTS = ['codealpha-minisocialmedia.onrender.com',  # Your Render domain
+        'localhost',
+        '127.0.0.1']  # Add your Render URL
     CSRF_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True  # Override the dev setting
