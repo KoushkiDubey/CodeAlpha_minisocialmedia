@@ -1,6 +1,9 @@
 import os
 from pathlib import Path
 from django.core.management.utils import get_random_secret_key
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -51,7 +54,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'socialmedia.wsgi.application'
 
-# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -61,6 +63,7 @@ DATABASES = {
 
 if 'DATABASE_URL' in os.environ:
     import dj_database_url
+
     DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -83,27 +86,33 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'core/static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Media files (Cloudinary in production, local in development)
-# Media files (Cloudinary in production, local in development)
+# Cloudinary Configuration (FIXED VERSION)
 if 'CLOUDINARY_CLOUD_NAME' in os.environ:
     CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),  # Use environment variable name
-        'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),        # Use environment variable name
-        'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),  # Use environment variable name
-        'MEDIA_FOLDER': 'django_uploads',  # Explicit folder name
-        'PREFIX': 'media/'  # URL prefix
+        'CLOUD_NAME': os.environ['CLOUDINARY_CLOUD_NAME'],
+        'API_KEY': os.environ['CLOUDINARY_API_KEY'],
+        'API_SECRET': os.environ['CLOUDINARY_API_SECRET'],
+        'MEDIA_FOLDER': 'django_uploads',
+        'PREFIX': 'media/'
     }
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    MEDIA_URL = '/media/'  # Keep this for URL reverse lookups
+    MEDIA_URL = '/media/'
+
+    # REQUIRED CLOUDINARY SDK CONFIG
+    cloudinary.config(
+        cloud_name=os.environ['CLOUDINARY_CLOUD_NAME'],
+        api_key=os.environ['CLOUDINARY_API_KEY'],
+        api_secret=os.environ['CLOUDINARY_API_SECRET']
+    )
 else:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'login'
