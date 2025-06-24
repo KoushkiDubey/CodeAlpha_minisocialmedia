@@ -1,13 +1,19 @@
 import os
+from pathlib import Path
+from django.core.management.utils import get_random_secret_key
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-your-secret-key-here'
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', get_random_secret_key())
 
+# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -49,13 +55,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'socialmedia.wsgi.application'
 
+# Database
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -71,45 +79,48 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
+# Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'core/static')]
+STATICFILES_DIRS = [BASE_DIR / 'core/static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Authentication URLs
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# Prevent session fixation
+
+# Session security
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = True  # If using HTTPS
+SESSION_COOKIE_SECURE = False  # True in production
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
-# ... (all your existing settings remain exactly the same) ...
-
-# ======== REQUIRED FOR ALL ENVIRONMENTS ========
-# Add this right above your production settings
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # 👈 Add this line
 
 # ======================
 # PRODUCTION SETTINGS (Railway only)
 # ======================
 if 'RAILWAY_ENVIRONMENT' in os.environ:
     DEBUG = False
-    ALLOWED_HOSTS += ['.up.railway.app']
+    ALLOWED_HOSTS = ['.up.railway.app', 'localhost', '127.0.0.1']
 
     # Database
     import dj_database_url
 
     DATABASES['default'] = dj_database_url.config(conn_max_age=600, ssl_require=True)
 
-    # Whitenoise configuration
+    # Static files
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
     # Security
