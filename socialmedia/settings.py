@@ -1,13 +1,18 @@
 import os
 from pathlib import Path
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-your-secret-key-here')
 
 # Security settings
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',') if os.getenv('ALLOWED_HOSTS') else []
+DEBUG = os.getenv('DEBUG', 'False') == 'True'  # Default to False in production
+ALLOWED_HOSTS = ['*'] if DEBUG else [
+    os.getenv('ZEABUR_HOST', 'your-project.zeabur.app'),  # Zeabur's default domain
+    'localhost',
+    '127.0.0.1'
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -51,12 +56,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'socialmedia.wsgi.application'
 
-# Database
+# Database (Zeabur automatically provides DATABASE_URL)
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),  # Fallback for local dev
+        conn_max_age=600,
+        ssl_require=not DEBUG
+    )
 }
 
 # Password validation
@@ -97,28 +103,8 @@ SESSION_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
-# Production settings (automatically applied when DEBUG=False)
+# Production security settings
 if not DEBUG:
-    # Security
     CSRF_COOKIE_SECURE = True
     SECURE_SSL_REDIRECT = True
-
-    # Database
-    import dj_database_url
-
-    DATABASES = {
-        'default': dj_database_url.config(
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
-    }
-
-    # Allowed hosts for production
-    RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
-    if RENDER_EXTERNAL_HOSTNAME:
-        ALLOWED_HOSTS.extend([
-            RENDER_EXTERNAL_HOSTNAME,
-            'localhost',
-            '127.0.0.1',
-            '.onrender.com'
-        ])
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # For Zeabur's proxy
