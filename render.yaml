@@ -2,24 +2,13 @@ services:
   - type: web
     name: minisocialmedia
     runtime: python
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn socialmedia.wsgi:application --bind 0.0.0.0:$PORT"
-    branch: master
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py migrate
+      python manage.py collectstatic --noinput
+    startCommand: gunicorn socialmedia.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
-      - key: SECRET_KEY
-        generateValue: true
-      - key: DEBUG
-        value: "False"
-      - key: PYTHON_VERSION
-        value: "3.13.5"  # Downgrade to supported version
       - key: DATABASE_URL
-        value: postgresql://${minisocialmedia-db.connectionString}  # Explicit template
-      - key: DJANGO_SETTINGS_MODULE
-        value: "socialmedia.settings"
-
-databases:
-  - name: minisocialmedia-db
-    plan: free
-    databaseName: socialmedia_prod
-    user: render_db_user  # Changed to standard naming
-    forceNew: true  # Ensures fresh database
+        value: postgresql://neondb_owner:npg_mVx1lXQ3sjrp@ep-billowing-bread-a81l0fml-pooler.eastus2.azure.neon.tech/neondb?sslmode=require # PASTE YOUR ACTUAL URL HERE
+      - key: DISABLE_COLLECTSTATIC
+        value: "0"
