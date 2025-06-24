@@ -13,15 +13,13 @@ services:
       - key: DISABLE_COLLECTSTATIC
         value: "0"
       - key: PYTHON_VERSION
-        value: "3.13.5"
-      # Explicit database connection (critical addition)
+        value: "3.12.3"
       - key: DATABASE_URL
         fromDatabase:
           name: minisocialmedia-db
           property: connectionString
-      # Required for Django to find your production settings
-      - key: DJANGO_SETTINGS_MODULE
-        value: "socialmedia.settings"
+      - key: RENDER_EXTERNAL_HOSTNAME
+        sync: false  # Let Render auto-inject this
 
 databases:
   - name: minisocialmedia-db
