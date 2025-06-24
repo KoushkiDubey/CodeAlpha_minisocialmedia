@@ -14,4 +14,6 @@ if [ -n "${DATABASE_URL}" ]; then
   python manage.py collectstatic --noinput
 else
   echo "WARNING: DATABASE_URL not set, skipping database operations"
-fi--noinput  # Only for static files
+fi
+
+echo "---- Build completed successfully ----"
