@@ -90,17 +90,20 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Media files (Cloudinary in production, local in development)
+# Media files (Cloudinary in production, local in development)
 if 'CLOUDINARY_CLOUD_NAME' in os.environ:
     CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': os.environ.get('dmwchfwit'),
-        'API_KEY': os.environ.get('718879363623822'),
-        'API_SECRET': os.environ.get('LOGdCemSdr6mmmF3zvCJk1pcvTI'),
+        'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),  # Use environment variable name
+        'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),        # Use environment variable name
+        'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),  # Use environment variable name
+        'MEDIA_FOLDER': 'django_uploads',  # Explicit folder name
+        'PREFIX': 'media/'  # URL prefix
     }
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = '/media/'  # Keep this for URL reverse lookups
 else:
     MEDIA_URL = '/media/'
     MEDIA_ROOT = BASE_DIR / 'media'
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = 'login'
