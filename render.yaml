@@ -11,16 +11,15 @@ services:
       - key: DEBUG
         value: "False"
       - key: PYTHON_VERSION
-        value: "3.12.3"
+        value: "3.13.5"  # Downgrade to supported version
       - key: DATABASE_URL
-        fromDatabase:
-          name: minisocialmedia-db
-          property: connectionString
+        value: postgresql://${minisocialmedia-db.connectionString}  # Explicit template
       - key: DJANGO_SETTINGS_MODULE
         value: "socialmedia.settings"
 
 databases:
   - name: minisocialmedia-db
     plan: free
-    databaseName: socialmedia_prod  # Changed to avoid conflicts
-    user: socialmedia_admin  # Changed username
+    databaseName: socialmedia_prod
+    user: render_db_user  # Changed to standard naming
+    forceNew: true  # Ensures fresh database
