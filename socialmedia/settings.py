@@ -1,20 +1,13 @@
 import os
-from pathlib import Path
-import dj_database_url
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-your-secret-key-here')
+SECRET_KEY = 'django-insecure-your-secret-key-here'
 
-# Security settings
-DEBUG = os.getenv('DEBUG', 'False') == 'True'  # Default to False in production
-ALLOWED_HOSTS = ['*'] if DEBUG else [
-    os.getenv('ZEABUR_HOST', 'your-project.zeabur.app'),  # Zeabur's default domain
-    'localhost',
-    '127.0.0.1'
-]
+DEBUG = True
 
-# Application definition
+ALLOWED_HOSTS = []
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -27,7 +20,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -56,55 +48,68 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'socialmedia.wsgi.application'
 
-# Database (Zeabur automatically provides DATABASE_URL)
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),  # Fallback for local dev
-        conn_max_age=600,
-        ssl_require=not DEBUG
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
 }
 
-# Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
-# Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [BASE_DIR / 'core/static']
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'core/static')]
 
-# Media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
-# Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Authentication
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'home'
 LOGOUT_REDIRECT_URL = 'login'
-
-# Session settings
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Prevent session fixation
 SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = True  # If using HTTPS
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+# ... (all your existing settings remain exactly the same) ...
 
-# Production security settings
-if not DEBUG:
+# ======== REQUIRED FOR ALL ENVIRONMENTS ========
+# Add this right above your production settings
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # 👈 Add this line
+
+# ======================
+# PRODUCTION SETTINGS (Railway only)
+# ======================
+if 'RAILWAY_ENVIRONMENT' in os.environ:
+    DEBUG = False
+    ALLOWED_HOSTS += ['.up.railway.app']
+
+    import dj_database_url
+
+    DATABASES['default'] = dj_database_url.config(
+        conn_max_age=600,
+        ssl_require=True
+    )
+
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
     CSRF_COOKIE_SECURE = True
-    SECURE_SSL_REDIRECT = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')  # For Zeabur's proxy
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
