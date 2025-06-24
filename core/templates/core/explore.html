@@ -12,7 +12,7 @@
                 <div class="col-md-4 mb-3">
                     <div class="card">
                         <div class="card-body text-center">
-                            <img src="{{ user.profile.image.url }}" class="rounded-circle mb-2" width="80" height="80">
+                            <img src="{{ user.profile.image }}" class="rounded-circle mb-2" width="80" height="80">
                             <h6>{{ user.username }}</h6>
                             <a href="{% url 'profile' user.username %}" class="btn btn-sm btn-outline-primary">View Profile</a>
                         </div>
@@ -32,7 +32,7 @@
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <div>
-                        <img src="{{ post.author.profile.image.url }}" class="rounded-circle" width="30" height="30">
+                        <img src="{{ post.author.profile.image }}" class="rounded-circle" width="30" height="30">
                         <a href="{% url 'profile' post.author.username %}" class="text-decoration-none ms-2">
                             {{ post.author.username }}
                         </a>
@@ -42,7 +42,7 @@
                 <div class="card-body">
                     <p class="card-text">{{ post.content }}</p>
                     {% if post.image %}
-                    <img src="{{ post.image.url }}" class="img-fluid mb-3">
+                    <img src="{{ post.image }}" class="img-fluid mb-3">
                     {% endif %}
 
                     <div class="d-flex justify-content-between">

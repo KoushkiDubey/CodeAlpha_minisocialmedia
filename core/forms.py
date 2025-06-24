@@ -11,11 +11,15 @@ class UserRegisterForm(UserCreationForm):
         fields = ['username', 'email', 'password1', 'password2']
 
 class ProfileUpdateForm(forms.ModelForm):
+    image = forms.ImageField(required=False)
+
     class Meta:
         model = Profile
         fields = ['bio', 'image']
 
 class PostForm(forms.ModelForm):
+    image = forms.ImageField(required=False)
+
     class Meta:
         model = Post
         fields = ['content', 'image']

@@ -8,7 +8,7 @@
             <div class="card-body text-center">
                 <!-- Fixed profile image with fallback -->
                 {% if user.profile.image %}
-                    <img src="{{ user.profile.image.url }}" class="rounded-circle mb-3" width="150" height="150" alt="{{ user.username }}'s profile picture">
+                    <img src="{{ user.profile.image }}" class="rounded-circle mb-3" width="150" height="150" alt="{{ user.username }}'s profile picture">
                 {% else %}
                     <img src="{% static 'core/images/default.jpg' %}" class="rounded-circle mb-3" width="150" height="150" alt="Default profile picture">
                 {% endif %}
@@ -47,7 +47,7 @@
                 <div class="card">
                     <a href="{% url 'post_detail' post.id %}">
                         {% if post.image %}
-                        <img src="{{ post.image.url }}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Post image">
+                        <img src="{{ post.image}}" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Post image">
                         {% else %}
                         <div class="card-img-top bg-light" style="height: 200px;"></div>
                         {% endif %}

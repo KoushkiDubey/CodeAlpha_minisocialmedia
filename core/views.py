@@ -5,6 +5,8 @@ from django.http import JsonResponse
 from .models import Post, Comment, Profile
 from .forms import PostForm, CommentForm, UserRegisterForm, ProfileUpdateForm
 from django.contrib.auth.models import User
+import cloudinary.uploader
+
 
 def register(request):
     if request.method == 'POST':
@@ -18,6 +20,7 @@ def register(request):
         form = UserRegisterForm()
     return render(request, 'core/auth/register.html', {'form': form})
 
+
 @login_required
 def home(request):
     following_users = request.user.following.all()
@@ -29,14 +32,18 @@ def home(request):
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
+
+            if 'image' in request.FILES:
+                upload_result = cloudinary.uploader.upload(
+                    request.FILES['image'],
+                    folder="post_images"
+                )
+                post.image = upload_result['secure_url']
+
             post.save()
             return redirect('home')
 
-    context = {
-        'posts': posts,
-        'form': form,
-    }
-    return render(request, 'core/home.html', context)
+    return render(request, 'core/home.html', {'posts': posts, 'form': form})
 
 
 @login_required
@@ -52,12 +59,11 @@ def profile(request, username):
             user.profile.followers.add(request.user)
         return redirect('profile', username=username)
 
-    context = {
+    return render(request, 'core/profile/profile.html', {
         'user': user,
         'posts': posts,
-        'is_following': is_following,
-    }
-    return render(request, 'core/profile/profile.html', context)
+        'is_following': is_following
+    })
 
 
 @login_required
@@ -65,6 +71,13 @@ def update_profile(request):
     if request.method == 'POST':
         form = ProfileUpdateForm(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid():
+            if 'image' in request.FILES:
+                upload_result = cloudinary.uploader.upload(
+                    request.FILES['image'],
+                    folder="profile_pics"
+                )
+                request.user.profile.image = upload_result['secure_url']
+
             form.save()
             messages.success(request, 'Your profile has been updated!')
             return redirect('profile', username=request.user.username)
@@ -72,6 +85,8 @@ def update_profile(request):
         form = ProfileUpdateForm(instance=request.user.profile)
 
     return render(request, 'core/profile/update_profile.html', {'form': form})
+
+
 @login_required
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
@@ -87,25 +102,20 @@ def post_detail(request, pk):
             comment.save()
             return redirect('post_detail', pk=post.pk)
 
-    context = {
+    return render(request, 'core/posts/post_detail.html', {
         'post': post,
         'comments': comments,
-        'form': form,
-    }
-    return render(request, 'core/posts/post_detail.html', context)
+        'form': form
+    })
 
 
 @login_required
 def like_post(request):
     if request.method == 'POST':
         post_id = request.POST.get('post_id')
-        if not post_id:
-            return JsonResponse({'error': 'Missing post_id'}, status=400)
-
         post = get_object_or_404(Post, id=post_id)
         user = request.user
 
-        # Toggle like status
         if user in post.likes.all():
             post.likes.remove(user)
             liked = False
@@ -119,13 +129,11 @@ def like_post(request):
             'post_id': post.id
         })
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
 @login_required
 def explore(request):
-    posts = Post.objects.all().order_by('-date_posted')
-    users = User.objects.exclude(id=request.user.id)
-
-    context = {
-        'posts': posts,
-        'users': users,
-    }
-    return render(request, 'core/explore.html', context)
+    return render(request, 'core/explore.html', {
+        'posts': Post.objects.all().order_by('-date_posted'),
+        'users': User.objects.exclude(id=request.user.id)
+    })
