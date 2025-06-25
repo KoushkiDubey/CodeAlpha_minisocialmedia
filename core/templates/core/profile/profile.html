@@ -1,12 +1,12 @@
 {% extends "core/base.html" %}
-{% load static %}  <!-- Add this at the top -->
+{% load static %}  
 
 {% block content %}
 <div class="row">
     <div class="col-md-8 mx-auto">
         <div class="card mb-4">
             <div class="card-body text-center">
-                <!-- Fixed profile image with fallback -->
+              
                 {% if user.profile.image %}
                     <img src="{{ user.profile.image }}" class="rounded-circle mb-3" width="150" height="150" alt="{{ user.username }}'s profile picture">
                 {% else %}
