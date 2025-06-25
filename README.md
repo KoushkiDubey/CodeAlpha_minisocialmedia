@@ -37,3 +37,11 @@ Username	Password	     Role
 codealpha	CodeAlpha@123  	Superuser
 testuser1	password1	    Regular user
 testuser2	password2	    Regular user
+
+### Key Features
+- 🖼️ **Cloud-powered media handling** (via Cloudinary)
+- 🤖 **Pre-loaded test data** (using Django fixtures)
+- 💬 **Real-time interactions** (posts, comments, likes)
+- 👥 **User relationship system** (following/followers)
+
+
