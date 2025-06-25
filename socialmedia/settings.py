@@ -51,7 +51,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'socialmedia.wsgi.application'
 
-# Database
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

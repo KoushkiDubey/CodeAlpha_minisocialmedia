@@ -45,3 +45,5 @@ class Comment(models.Model):
 
     def __str__(self):
         return f'{self.author.username}\'s Comment on {self.post}'
+
+
