@@ -29,9 +29,9 @@ python manage.py runserver
 
 🌐 Live Demo Access
 A deployed version is available at:
-https://web-production-bd0ab.up.railway.app
 
-⚠ Note: The db.sqlite3 file is included in the repo only to support Railway deployment for demo purposes.
+
+https://koushkii.pythonanywhere.com/
 
 
 Test User Credentials
